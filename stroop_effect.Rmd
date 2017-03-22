@@ -1,0 +1,81 @@
+---
+title: "Stroop Effect"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Variables
+The independent variable is the congruency of the words. The dependent variable is the time it takes it name the ink color for each list.
+
+### 2. Hypotheses
+- One appropriate null hypothesis $H_{0}$ is, $\mu_{I} = \mu_{C}$. That is, there is no time difference between the incongruent condition $\mu_{I}$ and the congruent condition $\mu_{C}$.   
+- One appropriate alternative hypothesis $H_{A}$ is $\mu_{I} > \mu_{C}$ or that it takes more time to name incongruent words than congruent words.   
+
+- Since the experiment is within-subject and we need to test the difference between paired samples (the congruent and incongruent conditions), a dependent t-test for paired samples is the most appropriate statistical test. Because we are interested in whether the time $\mu_{I}$ is greater than $\mu_{C}$ we will conduct a one-tailed t-test.        
+
+```{r, echo=FALSE}
+options(digits=2)
+stroop.data <- read.csv("stroopdata.csv", header=TRUE)
+
+x.i <- stroop.data$Incongruent 
+x.i.mean <- mean(x.i)
+x.i.median <- median(x.i)
+x.i.sd <- sd(x.i)
+
+x.c <- stroop.data$Congruent
+x.c.mean <- mean(x.c)
+x.c.median <- median(x.c)
+x.c.sd <- sd(x.c)
+```
+
+### 3. Descriptive statistics
+
+Statistic|Incongruent|Congruent 
+---------|-----------|--------- 
+n|`r length(x.i)`|`r length(x.c)`
+mean|`r x.i.mean`|`r x.c.mean`
+median|`r x.i.median`|`r x.c.median`
+standard deviation|`r x.i.sd`|`r x.c.sd`
+
+### 4. Visualizations 
+
+```{r, fig.width=4, echo=FALSE}
+boxplot(stroop.data, main="Stroop Effect Data", xlab="Condition", ylab="Completion Time in Seconds")
+```
+
+The boxplot illustrates that the median task completion time is lower for the congruent condition.   
+
+***
+```{r fig.width=4, echo=FALSE}
+hist(stroop.data$Incongruent, breaks=5, col="blue", main="Incongruent", xlab="Completion Times", ylab="Frequency")
+```
+```{r fig.width=4, echo=FALSE}
+hist(stroop.data$Congruent, breaks=5, col="blue", main="Congruent", xlab="Completion Times", ylab="Frequency")
+```
+
+The histograms show congruent completion times are centered around 15 seconds while incongruent times are centered around 20 seconds.
+
+### 5. Results 
+
+```{r, echo=FALSE}
+mean.diff <- x.i.mean - x.c.mean
+x.diffs <- x.i - x.c
+sd.diffs <- sd(x.diffs)
+sem <- sd.diffs/sqrt(length(x.i))
+x.tstat <- mean.diff/sem
+
+x.tcrit <- 1.714
+x.compare <- t.test(x.i, x.c, paired=TRUE)
+```
+  
+  
+Statistic|Result
+-|----------------------- 
+t-statistic|`r x.tstat`  
+t-critical value ($\alpha$ = .05)|`r x.tcrit`   
+p-value|.00
+
+Since the t-statistic is larger than the t-critical value we reject $H_{0}$, the null hypothesis that there is no difference between the time it takes to list incongruent and congruent words. 
